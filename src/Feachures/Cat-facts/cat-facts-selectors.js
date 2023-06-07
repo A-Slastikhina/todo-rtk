@@ -1,0 +1,1 @@
+export const selectCatFacts = (state)=> state.catFact.fact
