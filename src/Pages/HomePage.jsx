@@ -7,12 +7,12 @@ import {
 import { GreetingPage } from './GreetingPage';
 import { useSelector, useDispatch } from 'react-redux';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { moveTodo } from '../Feachures/Todos/todo-slice';
+import { moveTodo, refreshTodoList, refreshTodoList2} from '../Feachures/Todos/todo-slice';
 import { UrgentTodoList } from '../Feachures/Todos/UrgentTodoList';
-
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { SmallTitle, Title } from '../Components/StyledTitle';
-import { DogImg } from '../Feachures/Dogs-img/DogsImg';
+import { selectMoveInfo } from '../Feachures/Todos/todos-selector';
 
 const Wrapper = styled.div`
 width:100%;
@@ -27,12 +27,18 @@ export const HomePage = () => {
   const dispatch = useDispatch();
   const isNameEntered = useSelector(selectIsNameEntered);
   const name = useSelector(selectUserName);
-  const borderStyles = {
-    border: '1px solid rgba(0, 0, 0, 0.05)',
-  };
+  const moveInfo = useSelector(selectMoveInfo)
+  // const [startListId,setStartListId] = useState('') ;
+  // const [endListId,setEndtListId] = useState('') ; 
+  // const [todoIndexEnd,setTodoIndexEnd ] = useState('');
+  // const [todoId,seTtodoId ] = useState('');
+  const {todoId,startListName,endListName, todoText}= moveInfo
+
   const onDragEnd = (result) => {
-    
     const {destination, source, draggableID} = result;
+    // console.log(destination);
+    // console.log(source)
+
     if(!destination){
       return;
     }
@@ -41,13 +47,26 @@ export const HomePage = () => {
       destination.droppableId,
       source.index,
       destination.index,
-      draggableID
-    ))
+      draggableID,
+     
+    ));
   };
+
+
+  useEffect(()=>{
+        
+    if( endListName!==startListName){
+      setTimeout(()=>{
+        dispatch(refreshTodoList2({id:todoId, listName:endListName, text:todoText}))
+        dispatch(refreshTodoList({id:todoId, listName:startListName} ))
+      },0)
+    }
+  },[endListName,todoId,startListName])
+
   return (
     <>
    <Wrapper>
-   <DragDropContext onDragEnd={onDragEnd}>
+   <DragDropContext onDragEnd={onDragEnd} >
         <div className="maborderStylesin">
           {!isNameEntered && <GreetingPage/>}
           {isNameEntered && (

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
-import { refreshTodoList, refreshTodoList2 } from "../../config";
+// import { refreshTodoList, refreshTodoList2 } from "../../config";
 
 
 //import { CreateTodo } from "../../config";
@@ -23,7 +23,15 @@ const initialState ={
             list:[]
         }
     },
-
+    moveInfo:{
+        // startListId:'',
+        startListName:'',
+        // endListId:'',
+        endListName:'',
+        todoIndexEnd:'' ,
+        todoId:'',
+        todoText:''
+    }
 
 }
 
@@ -54,19 +62,19 @@ export const loadUrgentTodos = createAsyncThunk(
   
 //     }
 //   )
-//   const refreshTodoList = createAsyncThunk(
-//     '@@todos/move-delete-todo',
-//     async({id, listName}, {extra})=>{
-//         return extra.api.refreshTodoList({id, listName})
-//     }
-//   )
+export  const refreshTodoList = createAsyncThunk(
+    '@@todos/move-delete-todo',
+    async({id, listName}, {extra})=>{
+        return extra.api.refreshTodoList({id, listName})
+    }
+  )
 
-//   const refreshTodoList2 = createAsyncThunk(
-//     '@@todos/move-add-todo',
-//     async({id, listName, text}, {extra})=>{
-//         return extra.api.refreshTodoList2({id, listName, text})
-//     }
-//   )
+export  const refreshTodoList2 = createAsyncThunk(
+    '@@todos/move-add-todo',
+    async({id, listName, text}, {extra})=>{
+        return extra.api.refreshTodoList2({id, listName, text})
+    }
+  )
   export const deleteTodo = createAsyncThunk(
     '@@todos/delete-todo',
     async({id,listName}, {extra})=>{
@@ -137,8 +145,8 @@ const todoSlice = createSlice({
                         entries.forEach(entry => {
                             const listInfos =   Object.values(entry)   
                               if(listInfos[0]===droppableIdStart){
-                                listStart=listInfos[1]
-
+                               // listStart=listInfos[1]
+                                state.moveInfo.startListName=listInfos[1]
                                   currentObject=entry; 
                                 card = currentObject.list.splice(droppableIndexStart, 1);
                               
@@ -148,22 +156,22 @@ const todoSlice = createSlice({
                           entries.forEach(entry => {
                             const listInfos =   Object.values(entry)                               
                               if(listInfos[0]===droppableIdEnd){
-                                listInfosEnd=listInfos[1];
+                                state.moveInfo.endListName=listInfos[1];
                                 let objectEnd = entry;
-                             objectEnd.list.splice(droppableIndexEnd,0,...card)
-                            
+                             objectEnd.list.splice(droppableIndexEnd,0,...card);
+                             state.moveInfo.todoIndexEnd = droppableIndexEnd;   
                              currentTodoId=objectEnd.list[droppableIndexEnd].id;
-                             currentTodoText = objectEnd.list[droppableIndexEnd].text
+                             state.moveInfo.todoId=currentTodoId;
+                             currentTodoText = objectEnd.list[droppableIndexEnd].text;
+                             state.moveInfo.todoText=currentTodoText
                               }        
                            
                           }); 
                           
 
-                        refreshTodoList2({id:currentTodoId, listName:listInfosEnd, text:currentTodoText})
-                       refreshTodoList({id:currentTodoId, listName:listStart})
+                    //     refreshTodoList2({id:currentTodoId, listName:listInfosEnd, text:currentTodoText})
+                    //    refreshTodoList({id:currentTodoId, listName:listStart})
                         //   console.log(listStart, listInfosEnd, currentTodoId,currentTodoText);
-                          
-                          
 
                     }
 
@@ -196,7 +204,7 @@ const todoSlice = createSlice({
                
                   if(listInfos[1]===action.payload.listName){
                     
-                      currentObject=entry;
+                    currentObject=entry;
                      entry.list = entry.list.filter(item=>{
                         return item.id !==action.payload.id
                      })
@@ -205,12 +213,55 @@ const todoSlice = createSlice({
               });                    
 
         })
-        // .addCase(refreshTodoList.fulfilled, (state,action)=>{
-        // //     refreshTodoList2({id:currentTodoId, listName:listInfosEnd, text:currentTodoText})
-        // //     refreshTodoList({id:currentTodoId, listName:listStart})
-        
-        // })
+        .addCase(refreshTodoList.fulfilled, (state,action)=>{
+            // const droppableIdStart = state.startListId;
+            // const droppableIdEnd = state.endListId;
+            // const droppableIndexEnd = state.todoIndexEnd;
+            // console.log(state.startListId)
+            // let listStart;
+            // let listInfosEnd;
+            // let currentTodoId;
+            // let currentTodoText;
+            // const listObj = state.lists;
+            // const entries =  Object.values(listObj);
+            // if(droppableIdStart!==droppableIdEnd){
+            //   console.log('checked')
+               
+            //     entries.forEach(entry => {
+            //         const listInfos =   Object.values(entry)   
+            //           if(listInfos[0]===droppableIdStart){
+            //             listStart=listInfos[1]
 
+            //           }          
+            //       }); 
+                  
+            //       entries.forEach(entry => {
+            //         const listInfos =   Object.values(entry)                               
+            //           if(listInfos[0]===droppableIdEnd){
+            //             listInfosEnd=listInfos[1];
+            //             let objectEnd = entry;                  
+            //          currentTodoId=objectEnd.list[droppableIndexEnd].id;
+            //          currentTodoText = objectEnd.list[droppableIndexEnd].text
+            //           }        
+            
+            //      }); 
+                  
+        //         refreshTodoList2({id:currentTodoId, listName:listInfosEnd, text:currentTodoText})
+        //    refreshTodoList({id:currentTodoId, listName:listStart})
+              
+                  
+                  
+
+        //    }
+
+          //return  ({id:state.moveInfo.todoId, listName:state.moveInfo.startListName})
+        })
+        // .addCase(refreshTodoList.rejected, (state,action)=>{
+        //   return  console.log('rejected' + state.moveInfo.todoId)
+        // })
+        // .addCase(refreshTodoList2.fulfilled, (state, action)=>{
+        //     return  console.log('fulfilled' + state.moveInfo.todoId)
+        // })
     }
 
 })

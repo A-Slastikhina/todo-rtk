@@ -14,3 +14,6 @@ export const selectUrgentTodos = (state)=>{
     return state.todo.lists.urgentList.list
 }
 
+export const selectMoveInfo = (state)=>{
+    return state.todo.moveInfo
+}

@@ -74,8 +74,7 @@ export const refreshTodoList = async({id, listName})=>{
   })
   if (!res.ok) throw new Error(res.statusText)
   await res.json();
- 
-  return {id, listName} ;
+  // return {id, listName};
  } catch (error) {
   console.log(error)
  }
